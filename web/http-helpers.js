@@ -21,20 +21,16 @@ exports.serveAssets = function(res, asset, callback) {
   });
 };
 
-exports.archiveUrl = function(res, url, callback) {
-  console.log('inside archive url!', url);
-  fs.readFile(__dirname + '/../archives/sites.txt', function(err, data) {
-    console.log(__dirname + '/../archives/sites.txt');
-    if (err) {
-      console.log('error with archiving');
-      res.writeHead(404);
-      res.end();
-    } else {
-      callback(data, url);
-    }
-  });
-};
+// exports.archiveUrl = function(res, url, callback) {
+//   fs.readFile(__dirname + '/../archives/sites.txt', function(err, data) {
+//     if (err) {
+//       res.writeHead(404);
+//       res.end();
+//     } else {
+//       callback(data, url);
+//     }
+//   });
+// };
 
 
 
-// As you progress, keep thinking about what helper functions you can put here!

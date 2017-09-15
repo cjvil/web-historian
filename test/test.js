@@ -66,6 +66,8 @@ describe('server', function() {
           .expect(302, function (err) {
             if (!err) {
               var fileContents = fs.readFileSync(archive.paths.list, 'utf8');
+              console.log('FC: ' + fileContents);
+              console.log('Test URL: ' + url + '\n');
               expect(fileContents).to.equal(url + '\n');
             }
 
