@@ -49,8 +49,7 @@ exports.isUrlInList = function(url, callback) {
 exports.addUrlToList = function(url, callback) {
   exports.readListOfUrls(function(urlArray) {
     urlArray.push(url);
-    console.log(urlArray);
-    fs.writeFileSync(exports.paths.list, urlArray.length === 1 ? (urlArray[0] + '\n') : urlArray.join('\n'));
+    fs.writeFileSync(exports.paths.list, urlArray.join('\n'));
     callback();
   });
 };
@@ -67,29 +66,33 @@ exports.isUrlArchived = function(url, callback) {
 
 exports.downloadUrls = function(urls) {
   urls.forEach((url) => {
-    exports.isUrlArchived(url, function(isArchived) {
-      if (!isArchived) {
-        var options = {
-          host: url,
-          path: '/',
-          method: 'GET',
-          port: 80
-        };
+    (function() {
+      exports.isUrlArchived(url, function(isArchived) {
+        if (!isArchived) {
+          var options = {
+            host: url,
+            path: '/',
+            method: 'GET',
+            port: 80,
+            followAllRedirects: true
+          };
 
-        var req = http.request(options, (res) => {
-          var body = '';
-          res.on('data', (chunk) => {
+          var req = http.request(options, (res) => {
+            var body = '';
+            res.on('data', (chunk) => {
               body += chunk;
+            });
+            res.on('end', () => {
+              fs.writeFileSync(exports.paths.archivedSites + '/' + url, body);
+            });
           });
-          res.on('end', () => {
-            fs.writeFileSync(exports.paths.archivedSites + '/' + url, body);
-          });
-        });
 
-        req.on('error', (err) => (console.log(err)));
-        req.end();
+          req.on('error', (err) => (console.log(err)));
+          req.end();
 
-      }
-    });
+        }
+      }); 
+    }());
+
   });
 };
