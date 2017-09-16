@@ -7,7 +7,12 @@ var fs = require('fs');
 var methods = {
   GET: function(req, res, pathname) {
     if (pathname === '/') {
-      helpers.serveAssets(res, '/public/index.html', (data) => {
+      helpers.serveAssets(res, '/index.html', (data) => {
+        res.writeHead(200, helpers.headers);
+        res.end(data.toString());
+      });
+    } else if (pathname.startsWith('/www.')) {
+      helpers.getURLs(res, pathname, (data) => {
         res.writeHead(200, helpers.headers);
         res.end(data.toString());
       });
@@ -40,15 +45,34 @@ var methods = {
     req.on('end', () => {
       urlReq = urlReq.slice(4);
       // helpers.archiveUrl(res, urlReq, writeUrlToFile);
-      fs.appendFile(archive.paths.list, `${urlReq}` + '\n', (err) => {
-        if (err) {
-          res.writeHead(404);
-          res.end();  
-        } else {
-          res.writeHead(302, helpers.headers);
-          res.end();
-        }
-      });
+      // fs.appendFile(archive.paths.list, urlReq + '\n', (err) => {
+      //   if (err || !urlReq.startsWith('www.')) {
+      //     res.writeHead(404);
+      //     res.end();  
+      //   } else {
+      //     res.writeHead(302, helpers.headers);
+      //     res.end();
+      //   }
+      // });
+      if (urlReq.startsWith('www.')) {
+        archive.isUrlInList(urlReq, function(isInList) {
+          if (!isInList) {
+            archive.addUrlToList(urlReq, () => {
+              res.writeHead(302, helpers.headers);
+              res.end();
+            });
+          } else {
+            archive.isUrlArchived(urlReq, (archived) => {
+              if (archived) {
+                methods.GET(req, res, '/' + urlReq);
+              } else {
+                methods.GET(req, res, '/loading.html');
+              }
+            });
+          }
+        });
+      }
+      
     });
     
     

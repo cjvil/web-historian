@@ -32,7 +32,7 @@ exports.readListOfUrls = function(callback) {
     if (err) {
       throw err;
     } else {
-      var urls = data.toString().split('\n');
+      var urls = data.toString() === '' ? [] : data.toString().split('\n');
       callback(urls);
     }
   });
@@ -48,7 +48,8 @@ exports.isUrlInList = function(url, callback) {
 exports.addUrlToList = function(url, callback) {
   exports.readListOfUrls(function(urlArray) {
     urlArray.push(url);
-    fs.writeFileSync(exports.paths.list, urlArray.join('\n'));
+    console.log(urlArray);
+    fs.writeFileSync(exports.paths.list, urlArray.length === 1 ? (urlArray[0] + '\n') : urlArray.join('\n'));
     callback();
   });
 };
