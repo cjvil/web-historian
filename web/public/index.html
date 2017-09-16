@@ -5,8 +5,28 @@
 </head>
 <body>
   Enter a URL here:
-  <form method="POST">
-    <input type="input" name="url"></input>
-  </form>
+  <!-- <form method="POST"> -->
+  <input type="input" name="url"></input>
+  <button onclick="postForm()">Submit</button>
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script>
+    var postForm = () => {
+      var url = $('input').val();
+      $.ajax({
+        url: 'http://127.0.0.1:8080/',
+        type: 'POST',
+        contentType: 'application/json',
+        followAllRedirects: true,
+        data: {'url': url},
+        success: (data, status, xhr) => {
+          if (xhr.getResponseHeader('Location')) {
+            window.location.href = xhr.getResponseHeader('Location');
+          }
+        },
+        error: () => (console.log('error :('))
+      });
+    };
+  </script>
 </body>
 </html>
