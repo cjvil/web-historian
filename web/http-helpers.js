@@ -13,8 +13,15 @@ exports.headers = {
 exports.serveAssets = function(res, asset, callback) {
   fs.readFile(__dirname + asset, function(err, data) {
     if (err) {
-      res.writeHead(404);
-      res.end();
+      archive.addUrlToList(asset, () => {
+        archive.downloadUrls([asset], () => {
+          res.writeHead(404);
+          res.end();
+        });
+      });
+      // add url to list
+      // archive url
+      
     } else {
       callback(data);
     }
