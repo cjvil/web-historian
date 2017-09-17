@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
 var http = require('http');
+var request = require('request');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -69,27 +70,7 @@ exports.downloadUrls = function(urls) {
     (function() {
       exports.isUrlArchived(url, function(isArchived) {
         if (!isArchived) {
-          var options = {
-            host: url,
-            path: '/',
-            method: 'GET',
-            port: 80,
-            followAllRedirects: true
-          };
-
-          var req = http.request(options, (res) => {
-            var body = '';
-            res.on('data', (chunk) => {
-              body += chunk;
-            });
-            res.on('end', () => {
-              fs.writeFileSync(exports.paths.archivedSites + '/' + url, body);
-            });
-          });
-
-          req.on('error', (err) => (console.log(err)));
-          req.end();
-
+          request('http://' + url).pipe(fs.createWriteStream(exports.paths.archivedSites + '/' + url));
         }
       }); 
     }());
